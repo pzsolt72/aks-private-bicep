@@ -9,7 +9,7 @@ param acrName string
 var acrPullRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
 // Resources
-resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-03-02-preview' existing = {
+resource aksCluster 'Microsoft.ContainerService/managedClusters@2024-01-01' existing = {
   name: aksClusterName
 }
 

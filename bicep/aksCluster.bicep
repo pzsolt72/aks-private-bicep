@@ -379,18 +379,18 @@ var metricCategories = [
 var logs = [for category in logCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
+  // retentionPolicy: {
+  //   enabled: true
+  //   days: retentionInDays
+  // }
 }]
 var metrics = [for category in metricCategories: {
   category: category
   enabled: true
-  retentionPolicy: {
-    enabled: true
-    days: retentionInDays
-  }
+  // retentionPolicy: {
+  //   enabled: true
+  //   days: retentionInDays
+  // }
 }]
 
 // Resources
@@ -532,13 +532,13 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
     networkProfile: {
       networkPlugin: networkPlugin
       networkPolicy: networkPolicy
-      podCidr: networkPlugin == 'azure' ? json('null') : podCidr
+      podCidr: networkPlugin == 'azure' ? null : podCidr
       serviceCidr: serviceCidr
       dnsServiceIP: dnsServiceIP
       dockerBridgeCidr: dockerBridgeCidr
       outboundType: outboundType
       loadBalancerSku: loadBalancerSku
-      loadBalancerProfile: json('null')
+      loadBalancerProfile: null
     }
     workloadAutoScalerProfile: {
       keda: {
@@ -570,7 +570,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
     apiServerAccessProfile: {
       enablePrivateCluster: enablePrivateCluster
       enableVnetIntegration: enableVnetIntegration
-      privateDNSZone: enablePrivateCluster ? privateDNSZone : json('null')
+      privateDNSZone: enablePrivateCluster ? privateDNSZone : null
       enablePrivateClusterPublicFQDN: enablePrivateClusterPublicFQDN
       subnetId: apiServerSubnet.id
     }

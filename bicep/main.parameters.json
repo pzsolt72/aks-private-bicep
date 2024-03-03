@@ -30,7 +30,7 @@
       "value": "azadmin"
     },
     "aksClusterSshPublicKey": {
-      "value": "<ssh-public-key>"
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC57j1ODC1H36LX5EjGgV+KugYXIw+RmkLpaLrIjA5bNgbHSdVXeyY30BJ3VEKFoaalox5A5irHXtcHKZ6fglpVFwwxvBMyvhfSp7JlyjEs65TfnPXDb3jc52clCx7hbJvO8oFQclnkwIcfg+UGFXuMEvLoEaLucZ7MeNY7j8h7u2HBGGhBqembCtyBCOIv76ryktwwDsHc6UO0zLFUsGoEJP2t+I/VajZvZZ2a2alSDbuB7Fsos8vZlMTJQOq3k4BLbiPU08/3rwKXeasWsz+l+7rjv0SuNh2CqsxSl5ytXY14M6fNFzFZfQtcJl8JoAkXjTXCg2qRdcWUWflJM0POB8SsC0UJVh8+FSGcmJcHo2puJUHceTf7dUoRCPnEY5SLuXRsRlKT/PUHwp4pHeA9k5HLLPvZcum3SPsuWTYB09aSJlvbXzHcLnGmIB4ubg0VDtE1/Wvx3gxg1wmHFb6lU1PapEkZRW0rN8xn2PyrCneQET9t2T0AVfcZe2kKsaE= azadmin@AsmlSapAksVm"
     },
     "aadProfileManaged": {
       "value": true
@@ -40,7 +40,7 @@
     },
     "aadProfileAdminGroupObjectIDs": {
       "value": [
-        "<admins-aad-security-group-object-id>"
+        "46aa1c0c-a400-4a58-bd46-160fd00fd2a2"
       ]
     },
     "systemAgentPoolName": {
@@ -151,7 +151,7 @@
       "value": "azadmin"
     },
     "vmAdminPasswordOrKey": {
-      "value": "<ssh-public-key>"
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC57j1ODC1H36LX5EjGgV+KugYXIw+RmkLpaLrIjA5bNgbHSdVXeyY30BJ3VEKFoaalox5A5irHXtcHKZ6fglpVFwwxvBMyvhfSp7JlyjEs65TfnPXDb3jc52clCx7hbJvO8oFQclnkwIcfg+UGFXuMEvLoEaLucZ7MeNY7j8h7u2HBGGhBqembCtyBCOIv76ryktwwDsHc6UO0zLFUsGoEJP2t+I/VajZvZZ2a2alSDbuB7Fsos8vZlMTJQOq3k4BLbiPU08/3rwKXeasWsz+l+7rjv0SuNh2CqsxSl5ytXY14M6fNFzFZfQtcJl8JoAkXjTXCg2qRdcWUWflJM0POB8SsC0UJVh8+FSGcmJcHo2puJUHceTf7dUoRCPnEY5SLuXRsRlKT/PUHwp4pHeA9k5HLLPvZcum3SPsuWTYB09aSJlvbXzHcLnGmIB4ubg0VDtE1/Wvx3gxg1wmHFb6lU1PapEkZRW0rN8xn2PyrCneQET9t2T0AVfcZe2kKsaE= azadmin@AsmlSapAksVm"
     },
     "diskStorageAccounType": {
       "value": "Premium_LRS"
@@ -179,7 +179,7 @@
     },
     "keyVaultObjectIds": {
       "value": [
-        "<aad-security-group-or-account-object-id>"
+        "46aa1c0c-a400-4a58-bd46-160fd00fd2a2"
       ]
     },
     "openServiceMeshEnabled": {
@@ -225,7 +225,7 @@
       "value": 24
     },
     "nodeRestrictionEnabled":{
-      "value": false
+      "value": true
     },
     "workloadIdentityEnabled":{
       "value": true
