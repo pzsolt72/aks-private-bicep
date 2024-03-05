@@ -47,42 +47,24 @@
       "value": "system"
     },
     "systemAgentPoolVmSize": {
-      "value": "Standard_D4s_v3"
+      "value": "Standard_D2s_v3"
     },
     "systemAgentPoolOsDiskSizeGB": {
-      "value": 80
+      "value": 40
     },
     "systemAgentPoolAgentCount": {
-      "value": 3
+      "value": 1
     },
     "systemAgentPoolMaxCount": {
-      "value": 5
+      "value": 2
     },
     "systemAgentPoolMinCount": {
-      "value": 3
+      "value": 1
     },
     "systemAgentPoolNodeTaints": {
       "value": [
         "CriticalAddonsOnly=true:NoSchedule"
       ]
-    },
-    "userAgentPoolName": {
-      "value": "user"
-    },
-    "userAgentPoolVmSize": {
-      "value": "Standard_D4s_v3"
-    },
-    "userAgentPoolOsDiskSizeGB": {
-      "value": 80
-    },
-    "userAgentPoolAgentCount": {
-      "value": 3
-    },
-    "userAgentPoolMaxCount": {
-      "value": 5
-    },
-    "userAgentPoolMinCount": {
-      "value": 3
     },
     "enableVnetIntegration": {
       "value": true
@@ -127,22 +109,22 @@
       "value": "PerGB2018"
     },
     "logAnalyticsRetentionInDays": {
-      "value": 60
+      "value": 30
     },
     "vmName": {
       "value": "TestVm"
     },
     "vmSize": {
-      "value": "Standard_F4s_v2"
+      "value": "Standard_D2s_v3"
     },
     "imagePublisher": {
       "value": "Canonical"
     },
     "imageOffer": {
-      "value": "UbuntuServer"
+      "value": "0001-com-ubuntu-server-jammy"
     },
     "imageSku": {
-      "value": "18.04-LTS"
+      "value": "22_04-lts"
     },
     "authenticationType": {
       "value": "sshPublicKey"
@@ -191,15 +173,10 @@
     "systemAgentPoolKubeletDiskType": {
       "value": "OS"
     },
-    "userAgentPoolKubeletDiskType": {
-      "value": "OS"
-    },
     "systemAgentPoolOsDiskType": {
       "value": "Ephemeral"
     },
-    "userAgentPoolOsDiskType": {
-      "value": "Ephemeral"
-    },
+
     "deploymentScriptUri": {
       "value": "https://paolosalvatori.blob.core.windows.net/scripts/install-helm-charts.sh"
     },

@@ -185,85 +185,6 @@ param systemAgentPoolAvailabilityZones array = [
   '3'
 ]
 
-@description('Specifies the unique name of of the user node pool profile in the context of the subscription and resource group.')
-param userAgentPoolName string = 'nodepool1'
-
-@description('Specifies the vm size of nodes in the user node pool.')
-param userAgentPoolVmSize string = 'Standard_DS5_v2'
-
-@description('Specifies the OS Disk Size in GB to be used to specify the disk size for every machine in the system agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified..')
-param userAgentPoolOsDiskSizeGB int = 100
-
-@description('Specifies the OS disk type to be used for machines in a given agent pool. Allowed values are \'Ephemeral\' and \'Managed\'. If unspecified, defaults to \'Ephemeral\' when the VM supports ephemeral OS and has a cache disk larger than the requested OSDiskSizeGB. Otherwise, defaults to \'Managed\'. May not be changed after creation. - Managed or Ephemeral')
-@allowed([
-  'Ephemeral'
-  'Managed'
-])
-param userAgentPoolOsDiskType string = 'Ephemeral'
-
-@description('Specifies the number of agents (VMs) to host docker containers in the user node pool. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1.')
-param userAgentPoolAgentCount int = 3
-
-@description('Specifies the OS type for the vms in the user node pool. Choose from Linux and Windows. Default to Linux.')
-@allowed([
-  'Linux'
-  'Windows'
-])
-param userAgentPoolOsType string = 'Linux'
-
-@description('Specifies the maximum number of pods that can run on a node in the user node pool. The maximum number of pods per node in an AKS cluster is 250. The default maximum number of pods per node varies between kubenet and Azure CNI networking, and the method of cluster deployment.')
-param userAgentPoolMaxPods int = 30
-
-@description('Specifies the maximum number of nodes for auto-scaling for the user node pool.')
-param userAgentPoolMaxCount int = 5
-
-@description('Specifies the minimum number of nodes for auto-scaling for the user node pool.')
-param userAgentPoolMinCount int = 3
-
-@description('Specifies whether to enable auto-scaling for the user node pool.')
-param userAgentPoolEnableAutoScaling bool = true
-
-@description('Specifies the virtual machine scale set priority in the user node pool: Spot or Regular.')
-@allowed([
-  'Spot'
-  'Regular'
-])
-param userAgentPoolScaleSetPriority string = 'Regular'
-
-@description('Specifies the ScaleSetEvictionPolicy to be used to specify eviction policy for spot virtual machine scale set. Default to Delete. Allowed values are Delete or Deallocate.')
-@allowed([
-  'Delete'
-  'Deallocate'
-])
-param userAgentPoolScaleSetEvictionPolicy string = 'Delete'
-
-@description('Specifies the Agent pool node labels to be persisted across all nodes in the user node pool.')
-param userAgentPoolNodeLabels object = {}
-
-@description('Specifies the taints added to new nodes during node pool create and scale. For example, key=value:NoSchedule.')
-param userAgentPoolNodeTaints array = []
-
-@description('Determines the placement of emptyDir volumes, container runtime data root, and Kubelet ephemeral storage.')
-@allowed([
-  'OS'
-  'Temporary'
-])
-param userAgentPoolKubeletDiskType string = 'OS'
-
-@description('Specifies the type for the user node pool: VirtualMachineScaleSets or AvailabilitySet')
-@allowed([
-  'VirtualMachineScaleSets'
-  'AvailabilitySet'
-])
-param userAgentPoolType string = 'VirtualMachineScaleSets'
-
-@description('Specifies the availability zones for the agent nodes in the user node pool. Requirese the use of VirtualMachineScaleSets as node pool type.')
-param userAgentPoolAvailabilityZones array = [
-  '1'
-  '2'
-  '3'
-]
-
 @description('Specifies whether the httpApplicationRouting add-on is enabled or not.')
 param httpApplicationRoutingEnabled bool = false
 
@@ -706,23 +627,6 @@ module aksCluster 'aksCluster.bicep' = {
     systemAgentPoolType: systemAgentPoolType
     systemAgentPoolAvailabilityZones: systemAgentPoolAvailabilityZones
     systemAgentPoolKubeletDiskType: systemAgentPoolKubeletDiskType
-    userAgentPoolName: userAgentPoolName
-    userAgentPoolVmSize: userAgentPoolVmSize
-    userAgentPoolOsDiskSizeGB: userAgentPoolOsDiskSizeGB
-    userAgentPoolOsDiskType: userAgentPoolOsDiskType
-    userAgentPoolAgentCount: userAgentPoolAgentCount
-    userAgentPoolOsType: userAgentPoolOsType
-    userAgentPoolMaxPods: userAgentPoolMaxPods
-    userAgentPoolMaxCount: userAgentPoolMaxCount
-    userAgentPoolMinCount: userAgentPoolMinCount
-    userAgentPoolEnableAutoScaling: userAgentPoolEnableAutoScaling
-    userAgentPoolScaleSetPriority: userAgentPoolScaleSetPriority
-    userAgentPoolScaleSetEvictionPolicy: userAgentPoolScaleSetEvictionPolicy
-    userAgentPoolNodeLabels: userAgentPoolNodeLabels
-    userAgentPoolNodeTaints: userAgentPoolNodeTaints
-    userAgentPoolType: userAgentPoolType
-    userAgentPoolAvailabilityZones: userAgentPoolAvailabilityZones
-    userAgentPoolKubeletDiskType: userAgentPoolKubeletDiskType
     httpApplicationRoutingEnabled: httpApplicationRoutingEnabled
     openServiceMeshEnabled: openServiceMeshEnabled
     kedaEnabled: kedaEnabled

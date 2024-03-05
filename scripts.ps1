@@ -20,7 +20,7 @@ $keyVaultName="${aksPrefix}KeyVault"
 
 az group create --name $aksResourceGroupName --location $location
 
-az deployment group what-if `
+az deployment group create `
         --resource-group $aksResourceGroupName `
         --template-file $template `
         --parameters $parameters `
