@@ -28,4 +28,4 @@ az deployment group create `
         keyVaultName=$keyVaultName `
         vmName=$vmName
 
-
+az aks command invoke -g AsmlSapAksRG -n AsmlSapAks -c "kubectl get pods"

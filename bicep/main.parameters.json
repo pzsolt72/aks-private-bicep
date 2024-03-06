@@ -45,7 +45,7 @@
       "value": "system"
     },
     "systemAgentPoolVmSize": {
-      "value": "Standard_D2s_v3"
+      "value": "Standard_D4s_v3"
     },
     "systemAgentPoolOsDiskSizeGB": {
       "value": 40
@@ -54,10 +54,10 @@
       "value": 1
     },
     "systemAgentPoolMaxCount": {
-      "value": 2
+      "value": 3
     },
     "systemAgentPoolMinCount": {
-      "value": 1
+      "value": 0
     },
     "systemAgentPoolNodeTaints": {
       "value": []
@@ -129,7 +129,7 @@
       "value": true
     },
     "aksEnablePrivateClusterPublicFQDN":{
-      "value": false
+      "value": true
     },
     "podIdentityProfileEnabled": {
       "value": false

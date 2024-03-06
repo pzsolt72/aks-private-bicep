@@ -261,6 +261,10 @@ param imageCleanerIntervalHours int = 24
 @description('Specifies whether to enable Workload Identity. The default value is false.')
 param workloadIdentityEnabled bool = false
 
+@description('Specifies the name of the resource group containing agent pool nodes..')
+param nodeResourceGroup string = '${name}NodeRG'
+
+
 // Variables
 var diagnosticSettingsName = 'diagnosticSettings'
 var logCategories = [
@@ -328,6 +332,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-11-01' = {
   properties: {
     kubernetesVersion: kubernetesVersion
     dnsPrefix: dnsPrefix
+    nodeResourceGroup: nodeResourceGroup
     agentPoolProfiles: [
       {
         name: toLower(systemAgentPoolName)
