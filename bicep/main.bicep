@@ -24,17 +24,17 @@ param aksClusterDnsPrefix string = aksClusterName
   'azure'
   'kubenet'
 ])
-param aksClusterNetworkPlugin string = 'azure'
+param aksClusterNetworkPlugin string = 'kubenet'
 
 @description('Specifies the network policy used for building Kubernetes network. - calico or azure')
 @allowed([
   'azure'
   'calico'
 ])
-param aksClusterNetworkPolicy string = 'azure'
+param aksClusterNetworkPolicy string = 'calico'
 
 @description('Specifies the CIDR notation IP range from which to assign pod IPs when kubenet is used.')
-param aksClusterPodCidr string = '10.244.0.0/16'
+param aksClusterPodCidr string = '192.168.0.0/16'
 
 @description('A CIDR notation IP range from which to assign service cluster IPs. It must not overlap with any Subnet IP ranges.')
 param aksClusterServiceCidr string = '172.16.0.0/16'
@@ -42,8 +42,6 @@ param aksClusterServiceCidr string = '172.16.0.0/16'
 @description('Specifies the IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr.')
 param aksClusterDnsServiceIP string = '172.16.0.10'
 
-@description('Specifies the CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range.')
-param aksClusterDockerBridgeCidr string = '172.17.0.1/16'
 
 @description('Specifies the sku of the load balancer used by the virtual machine scale sets used by nodepools.')
 @allowed([
@@ -59,12 +57,12 @@ param aksClusterLoadBalancerSku string = 'standard'
 ])
 param aksClusterOutboundType string = 'loadBalancer'
 
-@description('Specifies the tier of a managed cluster SKU: Paid or Free')
+@description('Specifies the tier of a managed cluster SKU: Standard or Free')
 @allowed([
-  'Paid'
+  'Standard'
   'Free'
 ])
-param aksClusterSkuTier string = 'Paid'
+param aksClusterSkuTier string = 'Standard'
 
 @description('Specifies the version of Kubernetes specified when creating the managed cluster.')
 param aksClusterKubernetesVersion string = '1.18.8'
@@ -95,10 +93,10 @@ param aksClusterUpgradeChannel string = 'stable'
 param aksClusterEnablePrivateCluster bool = true
 
 @description('Specifies the Private DNS Zone mode for private cluster. When the value is equal to None, a Public DNS Zone is used in place of a Private DNS Zone')
-param aksPrivateDNSZone string = 'none'
+param aksPrivateDNSZone string = 'system'
 
 @description('Specifies whether to create additional public FQDN for private cluster or not.')
-param aksEnablePrivateClusterPublicFQDN bool = true
+param aksEnablePrivateClusterPublicFQDN bool = false
 
 @description('Specifies whether to enable managed AAD integration.')
 param aadProfileManaged bool = true
@@ -230,9 +228,6 @@ param autoScalerProfileUtilizationThreshold string = '0.5'
 @description('Specifies the max graceful termination time interval in seconds for the auto-scaler of the AKS cluster.')
 param autoScalerProfileMaxGracefulTerminationSec string = '600'
 
-@description('Specifies whether to enable API server VNET integration for the cluster or not.')
-param enableVnetIntegration bool = true
-
 @description('Specifies the name of the virtual network.')
 param virtualNetworkName string = '${aksClusterName}Vnet'
 
@@ -247,9 +242,6 @@ param systemAgentPoolSubnetAddressPrefix string = '10.0.0.0/16'
 
 @description('Specifies the name of the subnet hosting the worker nodes of the user agent pool of the AKS cluster.')
 param userAgentPoolSubnetName string = 'UserSubnet'
-
-@description('Specifies the address prefix of the subnet hosting the worker nodes of the user agent pool of the AKS cluster.')
-param userAgentPoolSubnetAddressPrefix string = '10.1.0.0/16'
 
 @description('Specifies whether to enable the Azure Blob CSI Driver. The default value is false.')
 param blobCSIDriverEnabled bool = false
@@ -272,9 +264,6 @@ param imageCleanerEnabled bool = false
 @description('Specifies whether ImageCleaner scanning interval in hours.')
 param imageCleanerIntervalHours int = 24
 
-@description('Specifies whether to enable Node Restriction. The default value is false.')
-param nodeRestrictionEnabled bool = false
-
 @description('Specifies whether to enable Workload Identity. The default value is false.')
 param workloadIdentityEnabled bool = true
 
@@ -284,14 +273,8 @@ param oidcIssuerProfileEnabled bool = true
 @description('Specifies the name of the subnet hosting the pods running in the AKS cluster.')
 param podSubnetName string = 'PodSubnet'
 
-@description('Specifies the address prefix of the subnet hosting the pods running in the AKS cluster.')
-param podSubnetAddressPrefix string = '10.2.0.0/16'
-
 @description('Specifies the name of the subnet delegated to the API server when configuring the AKS cluster to use API server VNET integration.')
 param apiServerSubnetName string = 'ApiServerSubnet'
-
-@description('Specifies the address prefix of the subnet delegated to the API server when configuring the AKS cluster to use API server VNET integration.')
-param apiServerSubnetAddressPrefix string = '10.3.0.0/28'
 
 @description('Specifies the name of the subnet which contains the virtual machine.')
 param vmSubnetName string = 'VmSubnet'
@@ -315,7 +298,7 @@ param logAnalyticsWorkspaceName string = '${aksClusterName}Workspace'
 param logAnalyticsSku string = 'PerNode'
 
 @description('Specifies the workspace data retention in days. -1 means Unlimited retention for the Unlimited Sku. 730 days is the maximum allowed for all other Skus.')
-param logAnalyticsRetentionInDays int = 60
+param logAnalyticsRetentionInDays int = 30
 
 @description('Specifies the name of the virtual machine.')
 param vmName string = 'TestVm'
@@ -327,10 +310,10 @@ param vmSize string = 'Standard_DS3_v2'
 param imagePublisher string = 'Canonical'
 
 @description('Specifies the offer of the platform image or marketplace image used to create the virtual machine.')
-param imageOffer string = 'UbuntuServer'
+param imageOffer string = '0001-com-ubuntu-server-jammy'
 
 @description('Specifies the Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
-param imageSku string = '18.04-LTS'
+param imageSku string = '22_04-lts'
 
 @description('Specifies the type of authentication when accessing the Virtual Machine. SSH key is recommended.')
 @allowed([
@@ -476,7 +459,6 @@ module containerRegistry 'containerRegistry.bicep' = {
     sku: acrSku
     adminUserEnabled: acrAdminUserEnabled
     workspaceId: workspace.outputs.id
-    retentionInDays: logAnalyticsRetentionInDays
     location: location
     tags: tags
   }
@@ -493,7 +475,6 @@ module storageAccount 'storageAccount.bicep' = {
     ]
     keyVaultName: keyVault.outputs.name
     workspaceId: workspace.outputs.id
-    retentionInDays: logAnalyticsRetentionInDays
     location: location
     tags: tags
   }
@@ -506,12 +487,6 @@ module network 'network.bicep' = {
     virtualNetworkAddressPrefixes: virtualNetworkAddressPrefixes
     systemAgentPoolSubnetName: systemAgentPoolSubnetName
     systemAgentPoolSubnetAddressPrefix: systemAgentPoolSubnetAddressPrefix
-    userAgentPoolSubnetName: userAgentPoolSubnetName
-    userAgentPoolSubnetAddressPrefix: userAgentPoolSubnetAddressPrefix
-    podSubnetName: podSubnetName
-    podSubnetAddressPrefix: podSubnetAddressPrefix
-    apiServerSubnetName: apiServerSubnetName
-    apiServerSubnetAddressPrefix: apiServerSubnetAddressPrefix
     vmSubnetName: vmSubnetName
     vmSubnetAddressPrefix: vmSubnetAddressPrefix
     vmSubnetNsgName: '${vmSubnetName}Nsg'
@@ -526,7 +501,6 @@ module network 'network.bicep' = {
     acrPrivateEndpointName: acrPrivateEndpointName
     acrId: containerRegistry.outputs.id
     workspaceId: workspace.outputs.id
-    retentionInDays: logAnalyticsRetentionInDays
     location: location
     tags: tags
   }
@@ -582,12 +556,8 @@ module aksCluster 'aksCluster.bicep' = {
   name: 'aksCluster'
   params: {
     name: aksClusterName
-    enableVnetIntegration: enableVnetIntegration
     virtualNetworkName: network.outputs.virtualNetworkName
     systemAgentPoolSubnetName: systemAgentPoolSubnetName
-    userAgentPoolSubnetName: userAgentPoolSubnetName
-    podSubnetName: podSubnetName
-    apiServerSubnetName: apiServerSubnetName
     managedIdentityName: aksManageIdentity.outputs.name
     dnsPrefix: aksClusterDnsPrefix
     networkPlugin: aksClusterNetworkPlugin
@@ -595,7 +565,6 @@ module aksCluster 'aksCluster.bicep' = {
     podCidr: aksClusterPodCidr
     serviceCidr: aksClusterServiceCidr
     dnsServiceIP: aksClusterDnsServiceIP
-    dockerBridgeCidr: aksClusterDockerBridgeCidr
     loadBalancerSku: aksClusterLoadBalancerSku
     outboundType: aksClusterOutboundType
     skuTier: aksClusterSkuTier
@@ -648,11 +617,9 @@ module aksCluster 'aksCluster.bicep' = {
     defenderSecurityMonitoringEnabled: defenderSecurityMonitoringEnabled
     imageCleanerEnabled: imageCleanerEnabled
     imageCleanerIntervalHours: imageCleanerIntervalHours
-    nodeRestrictionEnabled: nodeRestrictionEnabled
     workloadIdentityEnabled: workloadIdentityEnabled
     oidcIssuerProfileEnabled: oidcIssuerProfileEnabled
     podIdentityProfileEnabled: podIdentityProfileEnabled
-    retentionInDays: logAnalyticsRetentionInDays
     workspaceId: workspace.outputs.id
     location: location
     tags: clusterTags

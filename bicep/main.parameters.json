@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "aksClusterNetworkPlugin": {
-      "value": "azure"
+      "value": "kubenet"
     },
     "aksClusterNetworkPolicy": {
-      "value": "azure"
+      "value": "calico"
     },
     "aksClusterPodCidr": {
-      "value": "10.244.0.0/16"
+      "value": "192.168.0.0/16"
     },
     "aksClusterServiceCidr": {
       "value": "172.16.0.0/16"
@@ -17,14 +17,12 @@
     "aksClusterDnsServiceIP": {
       "value": "172.16.0.10"
     },
-    "aksClusterDockerBridgeCidr": {
-      "value": "172.17.0.1/16"
-    },
+
     "aksClusterOutboundType": {
       "value": "loadBalancer"
     },
     "aksClusterKubernetesVersion": {
-      "value": "1.24.0"
+      "value": "1.27.9"
     },
     "aksClusterAdminUsername": {
       "value": "azadmin"
@@ -66,35 +64,14 @@
         "CriticalAddonsOnly=true:NoSchedule"
       ]
     },
-    "enableVnetIntegration": {
-      "value": true
-    },
     "virtualNetworkAddressPrefixes": {
-      "value": "10.0.0.0/8"
+      "value": "10.243.0.0/16"
     },
     "systemAgentPoolSubnetName": {
       "value": "SystemSubnet"
     },
     "systemAgentPoolSubnetAddressPrefix": {
-      "value": "10.240.0.0/16"
-    },
-    "userAgentPoolSubnetName": {
-      "value": "UserSubnet"
-    },
-    "userAgentPoolSubnetAddressPrefix": {
-      "value": "10.241.0.0/16"
-    },
-    "podSubnetName": {
-      "value": "PodSubnet"
-    },
-    "podSubnetAddressPrefix": {
-      "value": "10.242.0.0/16"
-    },
-    "apiServerSubnetName": {
-      "value": "ApiServerSubnet"
-    },
-    "apiServerSubnetAddressPrefix": {
-      "value": "10.243.0.0/27"
+      "value": "10.243.0.0/24"
     },
     "vmSubnetName": {
       "value": "VmSubnet"
@@ -151,7 +128,7 @@
       "value": "ReadWrite"
     },
     "aksClusterEnablePrivateCluster": {
-      "value": false
+      "value": true
     },
     "aksEnablePrivateClusterPublicFQDN":{
       "value": false
@@ -200,9 +177,6 @@
     },
     "imageCleanerIntervalHours":{
       "value": 24
-    },
-    "nodeRestrictionEnabled":{
-      "value": true
     },
     "workloadIdentityEnabled":{
       "value": true

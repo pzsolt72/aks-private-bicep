@@ -14,8 +14,6 @@ param keyVaultName string
 @description('Specifies the resource id of the Log Analytics workspace.')
 param workspaceId string
 
-@description('Specifies the workspace data retention in days.')
-param retentionInDays int = 60
 
 @description('Specifies the location.')
 param location string = resourceGroup().location
@@ -51,7 +49,7 @@ var metrics = [for category in metricCategories: {
 }]
 
 // Resources
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: name
   location: location
   tags: tags
@@ -84,11 +82,11 @@ resource blobServiceDiagnosticSettings  'Microsoft.Insights/diagnosticSettings@2
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2021-10-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
 }
 
-resource storageAccountNameSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+resource storageAccountNameSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
   name: 'DataProtection--BlobStorage--AccountName'
   properties: {
@@ -96,7 +94,7 @@ resource storageAccountNameSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-
   }
 }
 
-resource storageAccountConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+resource storageAccountConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
   name: 'DataProtection--BlobStorage--ConnectionString'
   properties: {
@@ -104,7 +102,7 @@ resource storageAccountConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets
   }
 }
 
-resource storageAccountUseAzureCredentialSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+resource storageAccountUseAzureCredentialSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
   name: 'DataProtection--BlobStorage--UseAzureCredential'
   properties: {

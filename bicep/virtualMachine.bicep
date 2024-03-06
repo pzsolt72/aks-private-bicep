@@ -82,7 +82,7 @@ var linuxConfiguration = {
 }
 
 // Resources
-resource virtualMachineNic 'Microsoft.Network/networkInterfaces@2021-08-01' = {
+resource virtualMachineNic 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   name: vmNicName
   location: location
   tags: tags
@@ -101,11 +101,11 @@ resource virtualMachineNic 'Microsoft.Network/networkInterfaces@2021-08-01' = {
   }
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
 }
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: vmName
   location: location
   tags: tags
@@ -162,18 +162,18 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
   }
 }
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workspaceName
 }
 
-resource omsAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+resource omsAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
   parent: virtualMachine
   name: 'LogAnalytics'
   location: location
   properties: {
     publisher: 'Microsoft.EnterpriseCloud.Monitoring'
     type: 'OmsAgentForLinux'
-    typeHandlerVersion: '1.12'
+    typeHandlerVersion: '1.17'
     settings: {
       workspaceId: reference(logAnalyticsWorkspace.id, logAnalyticsWorkspace.apiVersion).customerId
       stopOnMultipleConnections: false
@@ -184,17 +184,17 @@ resource omsAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2021-11-
   }
 }
 
-resource omsDependencyAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  parent: virtualMachine
-  name: 'DependencyAgent'
-  location: location
-  properties: {
-    publisher: 'Microsoft.Azure.Monitoring.DependencyAgent'
-    type: 'DependencyAgentLinux'
-    typeHandlerVersion: '9.10'
-    autoUpgradeMinorVersion: true
-  }
-  dependsOn: [
-    omsAgentForLinux
-  ]
-}
+// resource omsDependencyAgentForLinux 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+//   parent: virtualMachine
+//   name: 'DependencyAgent'
+//   location: location
+//   properties: {
+//     publisher: 'Microsoft.Azure.Monitoring.DependencyAgent'
+//     type: 'DependencyAgentLinux'
+//     typeHandlerVersion: '9.10'
+//     autoUpgradeMinorVersion: true
+//   }
+//   dependsOn: [
+//     omsAgentForLinux
+//   ]
+// }

@@ -11,24 +11,6 @@ param systemAgentPoolSubnetName string = 'SystemSubnet'
 @description('Specifies the address prefix of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
 param systemAgentPoolSubnetAddressPrefix string = '10.0.0.0/16'
 
-@description('Specifies the name of the subnet hosting the worker nodes of the user agent pool of the AKS cluster.')
-param userAgentPoolSubnetName string = 'UserSubnet'
-
-@description('Specifies the address prefix of the subnet hosting the worker nodes of the user agent pool of the AKS cluster.')
-param userAgentPoolSubnetAddressPrefix string = '10.1.0.0/16'
-
-@description('Specifies the name of the subnet hosting the pods running in the AKS cluster.')
-param podSubnetName string = 'PodSubnet'
-
-@description('Specifies the address prefix of the subnet hosting the pods running in the AKS cluster.')
-param podSubnetAddressPrefix string = '10.2.0.0/16'
-
-@description('Specifies the name of the subnet delegated to the API server when configuring the AKS cluster to use API server VNET integration.')
-param apiServerSubnetName string = 'ApiServerSubnet'
-
-@description('Specifies the address prefix of the subnet delegated to the API server when configuring the AKS cluster to use API server VNET integration.')
-param apiServerSubnetAddressPrefix string = '10.3.0.0/28'
-
 @description('Specifies the name of the subnet which contains the virtual machine.')
 param vmSubnetName string = 'VmSubnet'
 
@@ -85,9 +67,6 @@ param acrId string
 
 @description('Specifies the resource id of the Log Analytics workspace.')
 param workspaceId string
-
-@description('Specifies the workspace data retention in days.')
-param retentionInDays int = 60
 
 @description('Specifies the location.')
 param location string = resourceGroup().location
@@ -311,7 +290,7 @@ resource bastionSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' =
   }
 }
 
-resource vmSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
+resource vmSubnetNsg 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
   name: vmSubnetNsgName
   location: location
   tags: tags
@@ -335,7 +314,7 @@ resource vmSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
 }
 
 // Virtual Network
-resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   name: virtualNetworkName
   location: location
   tags: tags
@@ -352,46 +331,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
           addressPrefix: systemAgentPoolSubnetAddressPrefix
           privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: userAgentPoolSubnetName
-        properties: {
-          addressPrefix: userAgentPoolSubnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: podSubnetName
-        properties: {
-          addressPrefix: podSubnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-          delegations: [
-            {
-              name: 'aks-delegation'
-              properties: {
-                serviceName: 'Microsoft.ContainerService/managedClusters'
-              }
-            }
-          ]
-        }
-      }
-      {
-        name: apiServerSubnetName
-        properties: {
-          addressPrefix: apiServerSubnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-          delegations: [
-            {
-              name: 'aks-delegation'
-              properties: {
-                serviceName: 'Microsoft.ContainerService/managedClusters'
-              }
-            }
-          ]
         }
       }
       {
@@ -419,7 +358,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
 }
 
 // Azure Bastion Host
-resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2021-08-01' = {
+resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   name: bastionPublicIpAddressName
   location: location
   tags: tags
@@ -431,7 +370,7 @@ resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2021-08-01'
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2021-08-01' = {
+resource bastionHost 'Microsoft.Network/bastionHosts@2023-09-01' = {
   name: bastionHostName
   location: location
   tags: tags
@@ -514,7 +453,7 @@ resource keyVaultPrivateDnsZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZ
 }
 
 // Private Endpoints
-resource blobStorageAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+resource blobStorageAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' = {
   name: storageAccountPrivateEndpointName
   location: location
   tags: tags
@@ -536,7 +475,7 @@ resource blobStorageAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2
   }
 }
 
-resource blobStorageAccountPrivateDnsZoneGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-08-01' = {
+resource blobStorageAccountPrivateDnsZoneGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-09-01' = {
   parent: blobStorageAccountPrivateEndpoint
   name: 'PrivateDnsZoneGroupName'
   properties: {
@@ -551,7 +490,7 @@ resource blobStorageAccountPrivateDnsZoneGroupName 'Microsoft.Network/privateEnd
   }
 }
 
-resource keyVaultPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-08-01' = {
+resource keyVaultPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' = {
   name: keyVaultPrivateEndpointName
   location: location
   tags: tags
@@ -573,7 +512,7 @@ resource keyVaultPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-08-01'
   }
 }
 
-resource keyVaultPrivateDnsZoneGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-08-01' = {
+resource keyVaultPrivateDnsZoneGroupName 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-09-01' = {
   parent: keyVaultPrivateEndpoint
   name: 'PrivateDnsZoneGroupName'
   properties: {
@@ -588,7 +527,7 @@ resource keyVaultPrivateDnsZoneGroupName 'Microsoft.Network/privateEndpoints/pri
   }
 }
 
-resource acrPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-08-01' = if (createAcrPrivateEndpoint) {
+resource acrPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' = if (createAcrPrivateEndpoint) {
   name: acrPrivateEndpointName
   location: location
   tags: tags
@@ -610,7 +549,7 @@ resource acrPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-08-01' = if
   }
 }
 
-resource acrPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-08-01' = if (createAcrPrivateEndpoint) {
+resource acrPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-09-01' = if (createAcrPrivateEndpoint) {
   parent: acrPrivateEndpoint
   name: 'acrPrivateDnsZoneGroup'
   properties: {

@@ -2,23 +2,11 @@
 @description('Specifies the name of the AKS cluster.')
 param name string = 'aks-${uniqueString(resourceGroup().id)}'
 
-@description('Specifies whether to enable API server VNET integration for the cluster or not.')
-param enableVnetIntegration bool = true
-
 @description('Specifies the name of the existing virtual network.')
 param virtualNetworkName string
 
 @description('Specifies the name of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
 param systemAgentPoolSubnetName string = 'SystemSubnet'
-
-@description('Specifies the name of the subnet hosting the worker nodes of the user agent pool of the AKS cluster.')
-param userAgentPoolSubnetName string = 'UserSubnet'
-
-@description('Specifies the name of the subnet hosting the pods running in the AKS cluster.')
-param podSubnetName string = 'PodSubnet'
-
-@description('Specifies the name of the subnet delegated to the API server when configuring the AKS cluster to use API server VNET integration.')
-param apiServerSubnetName string = 'ApiServerSubnet'
 
 @description('Specifies the name of the AKS user-defined managed identity.')
 param managedIdentityName string
@@ -31,17 +19,17 @@ param dnsPrefix string = name
   'azure'
   'kubenet'
 ])
-param networkPlugin string = 'azure'
+param networkPlugin string = 'kubenet'
 
 @description('Specifies the network policy used for building Kubernetes network. - calico or azure')
 @allowed([
   'azure'
   'calico'
 ])
-param networkPolicy string = 'azure'
+param networkPolicy string = 'calico'
 
 @description('Specifies the CIDR notation IP range from which to assign pod IPs when kubenet is used.')
-param podCidr string = '10.244.0.0/16'
+param podCidr string = '192.168.0.0/16'
 
 @description('A CIDR notation IP range from which to assign service cluster IPs. It must not overlap with any Subnet IP ranges.')
 param serviceCidr string = '172.16.0.0/16'
@@ -49,8 +37,6 @@ param serviceCidr string = '172.16.0.0/16'
 @description('Specifies the IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr.')
 param dnsServiceIP string = '172.16.0.10'
 
-@description('Specifies the CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range.')
-param dockerBridgeCidr string = '172.17.0.1/16'
 
 @description('Specifies the sku of the load balancer used by the virtual machine scale sets used by nodepools.')
 @allowed([
@@ -66,15 +52,15 @@ param loadBalancerSku string = 'standard'
 ])
 param outboundType string = 'loadBalancer'
 
-@description('Specifies the tier of a managed cluster SKU: Paid or Free')
+@description('Specifies the tier of a managed cluster SKU: Standard or Free')
 @allowed([
-  'Paid'
+  'Standard'
   'Free'
 ])
-param skuTier string = 'Paid'
+param skuTier string = 'Standard'
 
 @description('Specifies the version of Kubernetes specified when creating the managed cluster.')
-param kubernetesVersion string = '1.18.8'
+param kubernetesVersion string = '1.27.9'
 
 @description('Specifies the administrator username of Linux virtual machines.')
 param adminUsername string = 'azureuser'
@@ -102,10 +88,10 @@ param upgradeChannel string = 'stable'
 param enablePrivateCluster bool = true
 
 @description('Specifies the Private DNS Zone mode for private cluster. When the value is equal to None, a Public DNS Zone is used in place of a Private DNS Zone')
-param privateDNSZone string = 'none'
+param privateDNSZone string = 'system'
 
 @description('Specifies whether to create additional public FQDN for private cluster or not.')
-param enablePrivateClusterPublicFQDN bool = true
+param enablePrivateClusterPublicFQDN bool = false
 
 @description('Specifies whether to enable managed AAD integration.')
 param aadProfileManaged bool = true
@@ -143,10 +129,10 @@ param systemAgentPoolOsType string = 'Linux'
 param systemAgentPoolMaxPods int = 30
 
 @description('Specifies the maximum number of nodes for auto-scaling for the system node pool.')
-param systemAgentPoolMaxCount int = 5
+param systemAgentPoolMaxCount int = 3
 
 @description('Specifies the minimum number of nodes for auto-scaling for the system node pool.')
-param systemAgentPoolMinCount int = 3
+param systemAgentPoolMinCount int = 1
 
 @description('Specifies whether to enable auto-scaling for the system node pool.')
 param systemAgentPoolEnableAutoScaling bool = true
@@ -243,8 +229,6 @@ param autoScalerProfileMaxGracefulTerminationSec string = '600'
 @description('Specifies the resource id of the Log Analytics workspace.')
 param workspaceId string
 
-@description('Specifies the workspace data retention in days.')
-param retentionInDays int = 60
 
 @description('Specifies the location.')
 param location string = resourceGroup().location
@@ -273,8 +257,6 @@ param imageCleanerEnabled bool = false
 @description('Specifies whether ImageCleaner scanning interval in hours.')
 param imageCleanerIntervalHours int = 24
 
-@description('Specifies whether to enable Node Restriction. The default value is false.')
-param nodeRestrictionEnabled bool = false
 
 @description('Specifies whether to enable Workload Identity. The default value is false.')
 param workloadIdentityEnabled bool = false
@@ -315,40 +297,26 @@ var metrics = [for category in metricCategories: {
 }]
 
 // Resources
-resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-09-30-preview' existing = {
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: managedIdentityName
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-08-01' existing =  {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' existing =  {
   name: virtualNetworkName
 }
 
-resource systemAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' existing = {
+resource systemAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
   parent: virtualNetwork
   name: systemAgentPoolSubnetName
 }
 
-resource userAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' existing = {
-  parent: virtualNetwork
-  name: userAgentPoolSubnetName
-}
-
-resource podSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' existing = {
-  parent: virtualNetwork
-  name: podSubnetName
-}
-
-resource apiServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' existing = {
-  parent: virtualNetwork
-  name: apiServerSubnetName
-}
 
 resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-11-01' = {
   name: name
   location: location
   tags: tags
   sku: {
-    name: 'Basic'
+    name: 'Base'
     tier: skuTier
   }
   identity: {
@@ -368,7 +336,6 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-11-01' = {
         osDiskSizeGB: systemAgentPoolOsDiskSizeGB
         osDiskType: systemAgentPoolOsDiskType
         vnetSubnetID: systemAgentPoolSubnet.id
-        podSubnetID: podSubnet.id
         maxPods: systemAgentPoolMaxPods
         osType: systemAgentPoolOsType
         maxCount: systemAgentPoolMaxCount
@@ -469,10 +436,9 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-11-01' = {
     }
     apiServerAccessProfile: {
       enablePrivateCluster: enablePrivateCluster
-      enableVnetIntegration: enableVnetIntegration
       privateDNSZone: enablePrivateCluster ? privateDNSZone : null
       enablePrivateClusterPublicFQDN: enablePrivateClusterPublicFQDN
-      subnetId: apiServerSubnet.id
+
     }
     securityProfile: {
       defender: {
@@ -484,9 +450,6 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-11-01' = {
       imageCleaner: {
         enabled: imageCleanerEnabled
         intervalHours: imageCleanerIntervalHours
-      }
-      nodeRestriction: {
-        enabled: nodeRestrictionEnabled
       }
       workloadIdentity: {
         enabled: workloadIdentityEnabled

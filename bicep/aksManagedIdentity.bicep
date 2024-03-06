@@ -27,22 +27,22 @@ param tags object
 var networkContributorRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')
 
 // Resources
-resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-09-30-preview' = {
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: managedIdentityName
   location: location
   tags: tags
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-08-01' existing =  {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' existing =  {
   name: virtualNetworkName
 }
 
-resource systemAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' existing = {
+resource systemAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
   parent: virtualNetwork
   name: systemAgentPoolSubnetName
 }
 
-resource userAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' existing = {
+resource userAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
   parent: virtualNetwork
   name: userAgentPoolSubnetName
 }
@@ -57,7 +57,7 @@ resource apiServerSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' 
   name: apiServerSubnetName
 }
 
-resource systemAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource systemAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name:  guid(managedIdentity.id, systemAgentPoolSubnet.id, networkContributorRoleDefinitionId)
   scope: systemAgentPoolSubnet
   properties: {
@@ -67,7 +67,7 @@ resource systemAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Author
   }
 }
 
-resource userAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource userAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name:  guid(managedIdentity.id, userAgentPoolSubnet.id, networkContributorRoleDefinitionId)
   scope: userAgentPoolSubnet
   properties: {
@@ -77,7 +77,7 @@ resource userAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Authoriz
   }
 }
 
-resource podSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource podSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name:  guid(managedIdentity.id, podSubnet.id, networkContributorRoleDefinitionId)
   scope: podSubnet
   properties: {
@@ -87,7 +87,7 @@ resource podSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/role
   }
 }
 
-resource apiServerSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource apiServerSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name:  guid(managedIdentity.id, apiServerSubnet.id, networkContributorRoleDefinitionId)
   scope: apiServerSubnet
   properties: {

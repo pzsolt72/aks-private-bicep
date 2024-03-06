@@ -24,17 +24,17 @@ param tags object
 var clusterAdminRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '0ab0b1a8-8aac-4efd-b8c2-3ee1fb270be8')
 
 // Resources
-resource aksCluster 'Microsoft.ContainerService/managedClusters@2022-05-02-preview' existing = {
+resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-11-01' existing = {
   name: clusterName
 }
 
-resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2021-09-30-preview' = {
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'scriptManagedIdentity'
   location: location
   tags: tags
 }
 
-resource clusterAdminContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource clusterAdminContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name:  guid(managedIdentity.id, aksCluster.id, clusterAdminRoleDefinitionId)
   scope: aksCluster
   properties: {
@@ -45,7 +45,7 @@ resource clusterAdminContributorRoleAssignment 'Microsoft.Authorization/roleAssi
 }
 
 // Script
-resource deploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+resource deploymentScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   name: 'bashScript'
   location: location
   kind: 'AzureCLI'

@@ -5,14 +5,12 @@ $location="westeurope"
 
 # AKS cluster name
 $aksPrefix="AsmlSapAks"
-$aksName="${aksPrefix}Aks"
+$aksName="${aksPrefix}"
 $aksResourceGroupName="${aksPrefix}RG"
-$validateTemplate=1
-$useWhatIf=1
+
 
 $acrName="${aksPrefix}Acr"
-$acrResourceGroupName="$aksResourceGroupName"
-$acrSku="Premium"
+
 
 $vmName="${aksPrefix}Vm"
 
@@ -29,3 +27,5 @@ az deployment group create `
         acrName=$acrName `
         keyVaultName=$keyVaultName `
         vmName=$vmName
+
+

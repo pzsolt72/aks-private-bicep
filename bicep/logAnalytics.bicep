@@ -24,7 +24,7 @@ param tags object
 var containerInsightsSolutionName = 'ContainerInsights(${name})'
 
 // Resources
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: name
   tags: tags
   location: location
