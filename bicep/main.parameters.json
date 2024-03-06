@@ -57,7 +57,7 @@
       "value": 3
     },
     "systemAgentPoolMinCount": {
-      "value": 0
+      "value": 1
     },
     "systemAgentPoolNodeTaints": {
       "value": []

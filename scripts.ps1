@@ -29,3 +29,22 @@ az deployment group create `
         vmName=$vmName
 
 az aks command invoke -g AsmlSapAksRG -n AsmlSapAks -c "kubectl get pods"
+
+$userPrincipalName=$(az account show --query user.name --output tsv)
+$userPrincipalName
+#$userObjectId=$(az ad user show --id $userPrincipalName --query id --output tsv)
+
+$userObjectId='46aa1c0c-a400-4a58-bd46-160fd00fd2a2'
+$aksClusterId=$(az aks show --name "$aksName" --resource-group "$aksResourceGroupName" --query id  --output tsv)
+$aksClusterId
+
+$role="Azure Kubernetes Service RBAC Cluster Admin"
+
+az role assignment list --assignee $userObjectId --scope $aksClusterId --query "[?roleDefinitionName=='$role'].roleDefinitionName" `
+  --output tsv
+
+
+az role assignment create --role "$role" --assignee $userObjectId --scope $aksClusterId --only-show-errors
+
+
+az acr import --name $acrName --source docker.io/library/nginx:latest --image nginx:latest
