@@ -60,9 +60,7 @@
       "value": 1
     },
     "systemAgentPoolNodeTaints": {
-      "value": [
-        "CriticalAddonsOnly=true:NoSchedule"
-      ]
+      "value": []
     },
     "virtualNetworkAddressPrefixes": {
       "value": "10.243.0.0/16"
