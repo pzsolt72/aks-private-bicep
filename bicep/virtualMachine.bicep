@@ -68,6 +68,7 @@ param tags object
 
 // Variables
 var vmNicName = '${vmName}Nic'
+
 var linuxConfiguration = {
   disablePasswordAuthentication: true
   ssh: {

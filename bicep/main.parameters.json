@@ -62,23 +62,22 @@
     "systemAgentPoolNodeTaints": {
       "value": []
     },
-    "virtualNetworkAddressPrefixes": {
-      "value": "10.243.0.0/16"
+
+    "virtualNetworkResourceGroup": {
+      "value": "AsmlSapAksNetRG"
+    },
+    "virtualNetworkName": {
+      "value": "AsmlSapAksVnet"
+    },    
+    "pepSubnetName": {
+      "value": "PepSubnet"
     },
     "systemAgentPoolSubnetName": {
-      "value": "SystemSubnet"
+      "value": "AksSubnet"
     },
-    "systemAgentPoolSubnetAddressPrefix": {
-      "value": "10.243.0.0/24"
-    },
+ 
     "vmSubnetName": {
       "value": "VmSubnet"
-    },
-    "vmSubnetAddressPrefix": {
-      "value": "10.243.1.0/24"
-    },
-    "bastionSubnetAddressPrefix": {
-      "value": "10.243.2.0/24"
     },
     "logAnalyticsSku": {
       "value": "PerGB2018"

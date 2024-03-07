@@ -119,6 +119,10 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
   }
 }
 
+
+
+
+
 // Outputs
 output id string = keyVault.id
 output name string = keyVault.name

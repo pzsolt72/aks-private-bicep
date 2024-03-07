@@ -2,11 +2,14 @@
 @description('Specifies the name of the AKS cluster.')
 param name string = 'aks-${uniqueString(resourceGroup().id)}'
 
+@description('Specifies the resource group name of the virtual network.')
+param virtualNetworkResourceGroup string
+
 @description('Specifies the name of the existing virtual network.')
 param virtualNetworkName string
 
 @description('Specifies the name of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
-param systemAgentPoolSubnetName string = 'SystemSubnet'
+param systemAgentPoolSubnetName string = 'AksSubnet'
 
 @description('Specifies the name of the AKS user-defined managed identity.')
 param managedIdentityName string
@@ -91,7 +94,7 @@ param enablePrivateCluster bool = true
 param privateDNSZone string = 'system'
 
 @description('Specifies whether to create additional public FQDN for private cluster or not.')
-param enablePrivateClusterPublicFQDN bool = false
+param enablePrivateClusterPublicFQDN bool = true
 
 @description('Specifies whether to enable managed AAD integration.')
 param aadProfileManaged bool = true
@@ -306,6 +309,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' existing =  {
+  scope: resourceGroup(virtualNetworkResourceGroup)
   name: virtualNetworkName
 }
 

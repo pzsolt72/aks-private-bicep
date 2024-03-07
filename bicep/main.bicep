@@ -231,17 +231,11 @@ param autoScalerProfileMaxGracefulTerminationSec string = '600'
 @description('Specifies the name of the virtual network.')
 param virtualNetworkName string = '${aksClusterName}Vnet'
 
-@description('Specifies the address prefixes of the virtual network.')
-param virtualNetworkAddressPrefixes string = '10.0.0.0/8'
+@description('Specifies the name of the existing virtual network resource group.')
+param virtualNetworkResourceGroup string
 
 @description('Specifies the name of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
-param systemAgentPoolSubnetName string = 'SystemSubnet'
-
-@description('Specifies the address prefix of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
-param systemAgentPoolSubnetAddressPrefix string = '10.0.0.0/16'
-
-@description('Specifies the name of the subnet hosting the worker nodes of the user agent pool of the AKS cluster.')
-param userAgentPoolSubnetName string = 'UserSubnet'
+param systemAgentPoolSubnetName string = 'AksSubnet'
 
 @description('Specifies whether to enable the Azure Blob CSI Driver. The default value is false.')
 param blobCSIDriverEnabled bool = false
@@ -279,11 +273,8 @@ param apiServerSubnetName string = 'ApiServerSubnet'
 @description('Specifies the name of the subnet which contains the virtual machine.')
 param vmSubnetName string = 'VmSubnet'
 
-@description('Specifies the address prefix of the subnet which contains the virtual machine.')
-param vmSubnetAddressPrefix string = '10.3.1.0/24'
-
-@description('Specifies the Bastion subnet IP prefix. This prefix must be within vnet IP prefix address space.')
-param bastionSubnetAddressPrefix string = '10.3.2.0/24'
+@description('Specifies the name of the subnet where the private endpoints go.')
+param pepSubnetName string
 
 @description('Specifies the name of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceName string = '${aksClusterName}Workspace'
@@ -484,13 +475,10 @@ module network 'network.bicep' = {
   name: 'network'
   params: {
     virtualNetworkName: virtualNetworkName
-    virtualNetworkAddressPrefixes: virtualNetworkAddressPrefixes
+    virtualNetworkResourceGroup: virtualNetworkResourceGroup
     systemAgentPoolSubnetName: systemAgentPoolSubnetName
-    systemAgentPoolSubnetAddressPrefix: systemAgentPoolSubnetAddressPrefix
-    vmSubnetName: vmSubnetName
-    vmSubnetAddressPrefix: vmSubnetAddressPrefix
+    pepSubnetName: pepSubnetName
     vmSubnetNsgName: '${vmSubnetName}Nsg'
-    bastionSubnetAddressPrefix: bastionSubnetAddressPrefix
     bastionSubnetNsgName: 'AzureBastionSubnetNsg'
     bastionHostName: bastionHostName
     createAcrPrivateEndpoint: acrSku == 'Premium'
@@ -511,7 +499,7 @@ module virtualMachine 'virtualMachine.bicep' = {
   params: {
     vmName: vmName
     vmSize: vmSize
-    vmSubnetId: network.outputs.vmSubnetId
+    vmSubnetId: network.outputs.aksSubnetId
     storageAccountName: storageAccount.outputs.name
     imagePublisher: imagePublisher
     imageOffer: imageOffer
@@ -534,11 +522,9 @@ module aksManageIdentity 'aksManagedIdentity.bicep' = {
   name: 'aksManageIdentity'
   params: {
     managedIdentityName: '${aksClusterName}Identity'
+    virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkName: network.outputs.virtualNetworkName
     systemAgentPoolSubnetName: systemAgentPoolSubnetName
-    userAgentPoolSubnetName: userAgentPoolSubnetName
-    podSubnetName: podSubnetName
-    apiServerSubnetName: apiServerSubnetName
     location: location
     tags: tags
   }
@@ -557,6 +543,7 @@ module aksCluster 'aksCluster.bicep' = {
   params: {
     name: aksClusterName
     virtualNetworkName: network.outputs.virtualNetworkName
+    virtualNetworkResourceGroup: virtualNetworkResourceGroup
     systemAgentPoolSubnetName: systemAgentPoolSubnetName
     managedIdentityName: aksManageIdentity.outputs.name
     dnsPrefix: aksClusterDnsPrefix

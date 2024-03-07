@@ -1,27 +1,19 @@
 // Parameters
+
+@description('Specifies the resource group name of the virtual network.')
+param virtualNetworkResourceGroup string
+
 @description('Specifies the name of the virtual network.')
 param virtualNetworkName string
 
-@description('Specifies the address prefixes of the virtual network.')
-param virtualNetworkAddressPrefixes string = '10.0.0.0/8'
-
 @description('Specifies the name of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
-param systemAgentPoolSubnetName string = 'SystemSubnet'
+param systemAgentPoolSubnetName string = 'AksSubnet'
 
-@description('Specifies the address prefix of the subnet hosting the worker nodes of the default system agent pool of the AKS cluster.')
-param systemAgentPoolSubnetAddressPrefix string = '10.0.0.0/16'
-
-@description('Specifies the name of the subnet which contains the virtual machine.')
-param vmSubnetName string = 'VmSubnet'
-
-@description('Specifies the address prefix of the subnet which contains the virtual machine.')
-param vmSubnetAddressPrefix string = '10.3.1.0/24'
+@description('Specifies the name of the subnet where the private endpoints go.')
+param pepSubnetName string
 
 @description('Specifies the name of the network security group associated to the subnet hosting the virtual machine.')
 param vmSubnetNsgName string = 'VmSubnetNsg'
-
-@description('Specifies the Bastion subnet IP prefix. This prefix must be within vnet IP prefix address space.')
-param bastionSubnetAddressPrefix string = '10.3.2.0/24'
 
 @description('Specifies the name of the network security group associated to the subnet hosting Azure Bastion.')
 param bastionSubnetNsgName string = 'AzureBastionNsg'
@@ -83,33 +75,9 @@ var nsgLogCategories = [
 var nsgLogs = [for category in nsgLogCategories: {
   category: category
   enabled: true
-  // retentionPolicy: {
-  //   enabled: true
-  //   days: retentionInDays
-  // }
 }]
-var vnetLogCategories = [
-  'VMProtectionAlerts'
-]
-var vnetMetricCategories = [
-  'AllMetrics'
-]
-var vnetLogs = [for category in vnetLogCategories: {
-  category: category
-  enabled: true
-  // retentionPolicy: {
-  //   enabled: true
-  //   days: retentionInDays
-  // }
-}]
-var vnetMetrics = [for category in vnetMetricCategories: {
-  category: category
-  enabled: true
-  // retentionPolicy: {
-  //   enabled: true
-  //   days: retentionInDays
-  // }
-}]
+
+
 var bastionLogCategories = [
   'BastionAuditLogs'
 ]
@@ -136,6 +104,36 @@ var bastionSubnetName = 'AzureBastionSubnet'
 var bastionPublicIpAddressName = '${bastionHostName}PublicIp'
 
 // Resources
+
+
+// Virtual Network
+resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
+  scope: resourceGroup(virtualNetworkResourceGroup)
+  name: virtualNetworkName
+}
+
+resource systemAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+  parent: vnet
+  name: systemAgentPoolSubnetName
+}
+
+// Private DNS Zones
+resource acrPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
+  scope: resourceGroup(virtualNetworkResourceGroup)
+  name: 'privatelink${environment().suffixes.acrLoginServer}'
+}
+
+resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
+  scope: resourceGroup(virtualNetworkResourceGroup)
+  name: 'privatelink.blob.${environment().suffixes.storage}'
+}
+
+resource keyVaultPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
+  scope: resourceGroup(virtualNetworkResourceGroup)
+  name: 'privatelink${environment().suffixes.keyvaultDns}'
+}
+
+
 
 // Network Security Groups
 resource bastionSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
@@ -313,49 +311,7 @@ resource vmSubnetNsg 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
   }
 }
 
-// Virtual Network
-resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
-  name: virtualNetworkName
-  location: location
-  tags: tags
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        virtualNetworkAddressPrefixes
-      ]
-    }
-    subnets: [
-      {
-        name: systemAgentPoolSubnetName
-        properties: {
-          addressPrefix: systemAgentPoolSubnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: vmSubnetName
-        properties: {
-          addressPrefix: vmSubnetAddressPrefix
-          networkSecurityGroup: {
-            id: vmSubnetNsg.id
-          }
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: bastionSubnetName
-        properties: {
-          addressPrefix: bastionSubnetAddressPrefix
-          networkSecurityGroup: {
-            id: bastionSubnetNsg.id
-          }
-        }
-      }
-    ]
-  }
-}
+
 
 // Azure Bastion Host
 resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
@@ -396,61 +352,8 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-09-01' = {
   }
 }
 
-// Private DNS Zones
-resource acrPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.${toLower(environment().name) == 'azureusgovernment' ? 'azurecr.us' : 'azurecr.io'}'
-  location: 'global'
-  tags: tags
-}
 
-resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.blob.${environment().suffixes.storage}'
-  location: 'global'
-  tags: tags
-}
 
-resource keyVaultPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.${toLower(environment().name) == 'azureusgovernment' ? 'vaultcore.usgovcloudapi.net' : 'vaultcore.azure.net'}'
-  location: 'global'
-  tags: tags
-}
-
-// Virtual Network Links
-resource acrPrivateDnsZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: acrPrivateDnsZone
-  name: 'link_to_${toLower(virtualNetworkName)}'
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: vnet.id
-    }
-  }
-}
-
-resource blobPrivateDnsZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: blobPrivateDnsZone
-  name: 'link_to_${toLower(virtualNetworkName)}'
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: vnet.id
-    }
-  }
-}
-
-resource keyVaultPrivateDnsZoneVirtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: keyVaultPrivateDnsZone
-  name: 'link_to_${toLower(virtualNetworkName)}'
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: vnet.id
-    }
-  }
-}
 
 // Private Endpoints
 resource blobStorageAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' = {
@@ -470,7 +373,7 @@ resource blobStorageAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2
       }
     ]
     subnet: {
-      id: '${vnet.id}/subnets/${vmSubnetName}'
+      id: '${vnet.id}/subnets/${pepSubnetName}'
     }
   }
 }
@@ -507,7 +410,7 @@ resource keyVaultPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01'
       }
     ]
     subnet: {
-      id: '${vnet.id}/subnets/${vmSubnetName}'
+      id: '${vnet.id}/subnets/${pepSubnetName}'
     }
   }
 }
@@ -544,7 +447,7 @@ resource acrPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' = if
       }
     ]
     subnet: {
-      id: '${vnet.id}/subnets/${vmSubnetName}'
+      id: '${vnet.id}/subnets/${pepSubnetName}'
     }
   }
 }
@@ -583,16 +486,6 @@ resource bastionSubnetNsgDiagnosticSettings 'Microsoft.Insights/diagnosticSettin
   }
 }
 
-resource vnetDiagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: diagnosticSettingsName
-  scope: vnet
-  properties: {
-    workspaceId: workspaceId
-    logs: vnetLogs
-    metrics: vnetMetrics
-  }
-}
-
 resource bastionDiagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: diagnosticSettingsName
   scope: bastionHost
@@ -606,9 +499,8 @@ resource bastionDiagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-0
 // Outputs
 output virtualNetworkId string = vnet.id
 output virtualNetworkName string = vnet.name
-output aksSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, systemAgentPoolSubnetName)
-output vmSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, vmSubnetName)
-output bastionSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, bastionSubnetName)
+output aksSubnetId string = systemAgentPoolSubnet.id
 output systemAgentPoolSubnetName string = systemAgentPoolSubnetName
-output vmSubnetName string = vmSubnetName
+output pepSubnetName string = pepSubnetName
 output bastionSubnetName string = bastionSubnetName
+output keyVaultPrivateDnsZoneId   string = keyVaultPrivateDnsZone.id
