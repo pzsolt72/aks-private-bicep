@@ -368,9 +368,6 @@ param acrAdminUserEnabled bool = false
 ])
 param acrSku string = 'Premium'
 
-@description('Specifies the name of the Azure Bastion resource.')
-param bastionHostName string = '${aksClusterName}Bastion'
-
 @description('Specifies the name of the private link to the Key Vault.')
 param keyVaultPrivateEndpointName string = 'KeyVaultPrivateEndpoint'
 
@@ -479,8 +476,6 @@ module network 'network.bicep' = {
     systemAgentPoolSubnetName: systemAgentPoolSubnetName
     pepSubnetName: pepSubnetName
     vmSubnetNsgName: '${vmSubnetName}Nsg'
-    bastionSubnetNsgName: 'AzureBastionSubnetNsg'
-    bastionHostName: bastionHostName
     createAcrPrivateEndpoint: acrSku == 'Premium'
     storageAccountPrivateEndpointName: blobStorageAccountPrivateEndpointName
     storageAccountId: storageAccount.outputs.id

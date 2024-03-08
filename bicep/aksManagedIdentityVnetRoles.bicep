@@ -28,7 +28,7 @@ resource systemAgentPoolSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-0
 
 
 resource systemAgentPoolSubnetNetworkContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(managedIdentity, systemAgentPoolSubnet.id, networkContributorRoleDefinitionId, '12345')
+  name: guid(managedIdentity, systemAgentPoolSubnet.id, networkContributorRoleDefinitionId, '123456')
   scope: systemAgentPoolSubnet
   properties: {
     roleDefinitionId: networkContributorRoleDefinitionId
